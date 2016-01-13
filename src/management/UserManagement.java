@@ -26,12 +26,11 @@ public class UserManagement implements Serializable {
                 try {
                     ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    Configuration.objInpMap.put(socket, ois);
-                    Configuration.objOutMap.put(socket, oos);
                     
                     Message message = new Message();
                     Message reply = new Message();
                     ClientService clientService = new ClientService();
+                    
                     while(true) {
                         //Takes a request from client
                         message = (Message) ois.readObject();
@@ -53,20 +52,6 @@ public class UserManagement implements Serializable {
             }
 
         }.start();
-    }
-
-    public void makeAnnouncement() throws IOException {
-        int i;
-        Message announcement = new Message();
-        announcement.code = 11;
-        announcement.displayMessage = "Contest is running";
-        
-        for(i = 1; i <= Configuration.CLIENT_COUNT; i++) {
-            //ObjectInputStream ois = Configuration.objInpMap.get(Configuration.clientSocket[i]);
-            ObjectOutputStream oos = Configuration.objOutMap.get(Configuration.clientSocket[i]);
-            oos.writeObject(announcement);
-            oos.flush();
-        }
     }
     
 }
