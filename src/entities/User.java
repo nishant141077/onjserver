@@ -17,18 +17,18 @@ public class User implements Serializable {
     public String password;
     public String secQuestion;
     public String answer;
-    public int problemSolved;
+//    public int problemSolved;
     public String gender;
     
     public User(String handle, String name, String password, String secQuestion,
-            String answer, int problemSolved, String gender) {
+            String answer, String gender) {
         this.handle = handle;
         this.name = name;
         this.password = password;
         this.secQuestion = secQuestion;
         this.answer = answer;
-        this.problemSolved = problemSolved;
-        this.gender = gender;
+//        this.problemSolved = problemSolved;
+        this.gender = gender;;
     }
     
     public User(String handle, String password) {

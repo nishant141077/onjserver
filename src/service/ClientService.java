@@ -35,7 +35,7 @@ public class ClientService {
         }
         else if(message.code == 3) {  //check question-anwswer correctness
             reply.user = new User(message.user.handle, "", "", message.user.secQuestion,
-                    message.user.answer, 0, "");
+                    message.user.answer, "");
             reply.code = message.code;
             reply.status = Database.checkUserValidity(message.user);
             return reply;
@@ -50,6 +50,21 @@ public class ClientService {
             reply.user = message.user;
             reply.code = message.code;
             reply.status = Database.registerUser(message.user);
+            return reply;
+        }
+        else if(message.code == 6) {  //get coder details based on handle
+            reply.code = message.code;
+            reply.status = true;
+            reply.coder = Database.getCoderDetails(message.coder);
+            if(reply.coder.name == null) {
+                reply.status = false;
+            }
+            return reply;
+        }
+        else if(message.code == 7) {  //get list of problems
+            reply.code = message.code;
+            reply.status = true;
+            reply.problemsList = Database.getProblemsList();
             return reply;
         }
         return new Message();

@@ -4,11 +4,16 @@
  */
 package management;
 
+import entities.Coder;
+import entities.Problem;
 import entities.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import javax.management.remote.JMXConnectionNotification;
 import javax.sound.midi.SysexMessage;
 import javax.swing.JOptionPane;
 
@@ -98,11 +103,93 @@ public class Database {
             preparedStatement = connection.prepareStatement(query);
             int temp = preparedStatement.executeUpdate();
             System.err.println(temp);
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
+            return false;
+        }
+        
+        //Insert into coder table also
+        String queryStr = "INSERT into coder(handle) values('"+user.handle+"')";
+        
+        try {
+            preparedStatement = connection.prepareStatement(queryStr);
+            int temp = preparedStatement.executeUpdate();
+            System.err.println(temp);
             return true;
         } catch(Exception exception) {
             JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
             return false;
         }
+        
+    }
+
+    public static Coder getCoderDetails(Coder coder) {
+        Coder coderDetails = new Coder();
+        coderDetails.handle = coder.handle;
+        String query = "SELECT name from user where handle = ?";
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, coder.handle);
+            resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()) {
+                coderDetails.name = resultSet.getString("name");
+            }
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());            
+        }
+        
+        String queryStr = "SELECT * from coder where handle = ?";
+        try {
+            preparedStatement = connection.prepareStatement(queryStr);
+            preparedStatement.setString(1, coder.handle);
+            resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()) {
+                coderDetails.aboutMe = resultSet.getString("about_me");
+                coderDetails.accepted = resultSet.getInt("ac");
+                coderDetails.compilationErrors = resultSet.getInt("cte");
+                coderDetails.contests = resultSet.getInt("contests");
+                coderDetails.problemsSolved = resultSet.getInt("problems_solved");
+                coderDetails.rating = resultSet.getInt("rating");
+                coderDetails.runtimeErrors = resultSet.getInt("rte");
+                coderDetails.submissions = resultSet.getInt("submissions");
+                coderDetails.timeLimitExceeds = resultSet.getInt("tle");
+                coderDetails.wrongAnswers = resultSet.getInt("wa");
+            }
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
+        }
+        
+        return coderDetails;
+    }
+
+    public static List<Problem> getProblemsList() {
+        List<Problem> problemsList = new ArrayList<Problem>();
+        String query = "SELECT code, name, difficulty, solvedby, attemptedby from problems";
+        
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
+         
+            while(resultSet.next()) {
+                Problem problem = new Problem();
+                problem.code = resultSet.getString("code");
+                problem.name = resultSet.getString("name");
+                problem.difficulty = resultSet.getInt("difficulty");
+                problem.solvedBy = resultSet.getInt("solvedby");
+                
+                int attemptedby = resultSet.getInt("attemptedby");
+                if(attemptedby == 0) 
+                    problem.accuracy = 0.0;
+                else 
+                    problem.accuracy = problem.solvedBy * 1.0 / attemptedby;
+                
+                problemsList.add(problem);
+            }
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
+        }
+        
+        return problemsList;
     }
     
 }

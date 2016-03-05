@@ -4,8 +4,12 @@
  */
 package management;
 
+import entities.Coder;
+import entities.Problem;
 import entities.User;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -17,4 +21,6 @@ public class Message implements Serializable {
     public User user;
     public boolean status;
     public String displayMessage;
+    public Coder coder;
+    public List<Problem> problemsList;
 }
