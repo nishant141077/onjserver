@@ -67,6 +67,12 @@ public class ClientService {
             reply.problemsList = Database.getProblemsList();
             return reply;
         }
+        else if(message.code == 8) {  //get problem details based on problem code
+            reply.code = message.code;
+            reply.status = true;
+            reply.problemDetails = Database.getProblemDetails(message.problemDetails.code);
+            return reply;
+        }
         return new Message();
     }
 

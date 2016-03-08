@@ -6,6 +6,7 @@ package management;
 
 import entities.Coder;
 import entities.Problem;
+import entities.ProblemDetails;
 import entities.User;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,4 +24,5 @@ public class Message implements Serializable {
     public String displayMessage;
     public Coder coder;
     public List<Problem> problemsList;
+    public ProblemDetails problemDetails;
 }

@@ -6,6 +6,7 @@ package management;
 
 import entities.Coder;
 import entities.Problem;
+import entities.ProblemDetails;
 import entities.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -190,6 +191,30 @@ public class Database {
         }
         
         return problemsList;
+    }
+
+    public static ProblemDetails getProblemDetails(String code) {
+        ProblemDetails problemDetails;
+        String query = "SELECT name, statement, difficulty, author, time_limit, "
+                + "source_limit, memory_limit from problems where code = ?";
+        
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, code);
+            resultSet = preparedStatement.executeQuery();
+            
+            if(resultSet.next()) {
+                problemDetails = new ProblemDetails(code, resultSet.getString("name"),
+                        resultSet.getString("statement"), resultSet.getString("author"),
+                        resultSet.getInt("time_limit"), resultSet.getInt("source_limit"), 
+                        resultSet.getInt("memory_limit"), resultSet.getInt("difficulty"));
+                return problemDetails;
+            }
+            
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
+        }
+        return new ProblemDetails(code);
     }
     
 }
