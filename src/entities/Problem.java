@@ -20,6 +20,10 @@ public class Problem implements Serializable {
     
     public Problem() {}
     
+    public Problem(String code) {
+        this.code = code;
+    }
+    
     public Problem(String name, String code, int difficulty, int solvedBy, double accuracy) {
         this.accuracy = accuracy;
         this.code = code;

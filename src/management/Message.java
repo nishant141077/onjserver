@@ -7,9 +7,10 @@ package management;
 import entities.Coder;
 import entities.Problem;
 import entities.ProblemDetails;
+import entities.ProblemStats;
+import entities.Submission;
 import entities.User;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,4 +26,7 @@ public class Message implements Serializable {
     public Coder coder;
     public List<Problem> problemsList;
     public ProblemDetails problemDetails;
+    public List<String> tagsList;
+    public ProblemStats problemStats;
+    public Submission submission;
 }

@@ -5,6 +5,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -30,7 +31,8 @@ public class ProblemDetails implements Serializable {
     public int sourceLimit;
     public int memoryLimit;
     public int difficulty;
-
+    public List<String> problemTags;  //those tags initially added by author
+    public List<String> coderTags;    //those tags added by the coder/user for his purpose
     
     public ProblemDetails(String code) {
         this.code = code;
@@ -54,7 +56,8 @@ public class ProblemDetails implements Serializable {
     }*/
     
     public ProblemDetails(String code, String name, String statement, String author,
-            int timeLimit, int sourceLimit, int memoryLimit, int difficulty) {
+            int timeLimit, int sourceLimit, int memoryLimit, int difficulty, 
+            List<String> problemTags, List<String> coderTags) {
         this.code = code;
         this.name = name;
         this.statement = statement;
@@ -63,5 +66,7 @@ public class ProblemDetails implements Serializable {
         this.sourceLimit = sourceLimit;
         this.memoryLimit = memoryLimit;
         this.difficulty = difficulty;
+        this.problemTags = problemTags;
+        this.coderTags = coderTags;
     }
 }

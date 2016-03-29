@@ -4,22 +4,25 @@
  */
 package service;
 
+import entities.Coder;
 import entities.User;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import management.Database;
 import management.Message;
+import management.SubmissionManagement;
 /**
  *
  * @author nishant
  */
 public class ClientService {
     
-    public ClientService() throws SQLException {
+    public ClientService() throws SQLException, ClassNotFoundException {
+        Class.forName("com.mysql.jdbc.Driver");
         Database.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/onjserver", "root", "123");
     }
     
-    public Message serveClient(Message message) {
+    public Message serveClient(Message message) throws Exception {
         Message reply = new Message();
         if(message.code == 1) { //search handle
             reply.user = new User(message.user.handle, message.user.password);
@@ -67,10 +70,56 @@ public class ClientService {
             reply.problemsList = Database.getProblemsList();
             return reply;
         }
-        else if(message.code == 8) {  //get problem details based on problem code
+        else if(message.code == 8) {  //get problem details based on problem code and handle 
             reply.code = message.code;
             reply.status = true;
-            reply.problemDetails = Database.getProblemDetails(message.problemDetails.code);
+            reply.problemDetails = Database.getProblemDetails(message.problemDetails.code, message.coder.handle);
+            return reply;
+        }
+        else if(message.code == 9) {  //get all tags available
+            reply.code = message.code;
+            reply.tagsList = Database.getTagsList();
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 10) {  //add tags by coder to a problem
+            reply.code = message.code;
+            Database.addCoderTags(message.coder.handle, message.problemDetails.code, message.tagsList);
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 11) {  //refresh problem page
+            reply.code = message.code;
+            reply.problemDetails = Database.getProblemDetails(message.problemDetails.code, message.coder.handle);
+            reply.tagsList = Database.getTagsList();
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 12) {  //get problem statistics
+            reply.code = message.code;
+            reply.problemStats = Database.getProblemStats(message.problemStats.code);
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 13) {  //send submission
+            reply.code = message.code;
+            reply.submission = new SubmissionManagement(message.submission, message.problemDetails)
+                    .getSubmissionStatus();
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 14) {  //get solved problems list
+            reply.code = message.code;
+            reply.coder = new Coder(message.coder.handle);
+            reply.problemsList = Database.getSolvedProblemsList(message.coder.handle);
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 15) {  //get attempted unsolved problems list 
+            reply.code = message.code;
+            reply.coder = new Coder(message.coder.handle);
+            reply.problemsList = Database.getAttemptedUnsolvedProblemsList(message.coder.handle);
+            reply.status = true;
             return reply;
         }
         return new Message();
