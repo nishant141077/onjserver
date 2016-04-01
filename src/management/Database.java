@@ -204,7 +204,7 @@ public class Database {
         } catch(Exception exception) {
             JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
         }
-        
+        Sorter.sortByName(problemsList, 1);
         return problemsList;
     }
 

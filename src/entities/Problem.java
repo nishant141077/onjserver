@@ -5,6 +5,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  *
@@ -31,4 +32,5 @@ public class Problem implements Serializable {
         this.name = name;
         this.solvedBy = solvedBy;
     }
+
 }
