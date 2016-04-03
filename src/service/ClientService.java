@@ -5,6 +5,7 @@
 package service;
 
 import entities.Coder;
+import entities.ProblemDetails;
 import entities.User;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -119,6 +120,14 @@ public class ClientService {
             reply.code = message.code;
             reply.coder = new Coder(message.coder.handle);
             reply.problemsList = Database.getAttemptedUnsolvedProblemsList(message.coder.handle);
+            reply.status = true;
+            return reply;
+        }
+        else if(message.code == 16) {  //get SubmissionsList for a handle and code
+            reply.code = message.code;
+            reply.coder = new Coder(message.coder.handle);
+            reply.problemDetails = new ProblemDetails(message.problemDetails.code);
+            reply.mySubmissions = Database.getSubmissionsList(message.coder.handle, message.problemDetails.code);
             reply.status = true;
             return reply;
         }

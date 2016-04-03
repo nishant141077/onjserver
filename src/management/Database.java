@@ -569,4 +569,29 @@ public class Database {
         }
         return attemptedUnsolvedProblemsList;
     }
+
+    public static List<Submission> getSubmissionsList(String handle, String code) {
+        String query = "SELECT  SID, date_time, handle, status, error_code, time, language "
+                + "from submissions where handle = ? and pcode = ?";
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        List<Submission> submissions = new ArrayList<Submission>();
+        
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, handle);
+            preparedStatement.setString(2, code);
+            resultSet = preparedStatement.executeQuery();
+            
+            while(resultSet.next()) {
+                submissions.add(new Submission(resultSet.getString(1), resultSet.getString(2), 
+                        resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), 
+                        resultSet.getDouble(6), resultSet.getString(7)));
+            }
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());            
+        }
+        Sorter.sortSubmissionsByDateTime(submissions, 2); //newer submission first
+        return submissions;
+    }
 }

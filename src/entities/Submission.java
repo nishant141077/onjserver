@@ -44,4 +44,15 @@ public class Submission implements Serializable {
         this.memory = memory;
         this.dateTime = dateTime;
     }
+    
+    public Submission(String sid, String dateTime, String handle, String status, 
+            String errorCode, double time, String language) {
+        this.sid = sid;
+        this.dateTime = dateTime;
+        this.handle = handle;
+        this.status = status;
+        this.errorCode = errorCode;
+        this.time = time;
+        this.language = language;
+    }
 }

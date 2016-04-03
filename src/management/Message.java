@@ -29,4 +29,5 @@ public class Message implements Serializable {
     public List<String> tagsList;
     public ProblemStats problemStats;
     public Submission submission;
+    public List<Submission> mySubmissions;
 }
