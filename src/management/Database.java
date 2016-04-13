@@ -391,13 +391,14 @@ public class Database {
         
         try {
             if(submission.status.equals("Accepted")) {
-                query = "UPDATE coder SET problems_solved = ?, submissions = ?, ac = ? where handle = ?";
+                query = "UPDATE coder SET problems_solved = ?, submissions = ?, ac = ?, rating = ? where handle = ?";
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setInt(1, cd.problemsSolved + 
                         getProblemSolvedIncrement(submission.handle, submission.code));
                 preparedStatement.setInt(2, cd.submissions + 1);
                 preparedStatement.setInt(3, cd.accepted + 1);
-                preparedStatement.setString(4, submission.handle);
+                preparedStatement.setInt(4, cd.rating + getRatingChange(submission));
+                preparedStatement.setString(5, submission.handle);
             }
             else if(submission.status.equals("Compilation Error")) {
                 query = "UPDATE coder SET submissions = ?, cte = ? where handle = ?";
@@ -407,25 +408,28 @@ public class Database {
                 preparedStatement.setString(3, submission.handle);
             }
             else if(submission.status.equals("Runtime Error")) {
-                query = "UPDATE coder SET submissions = ?, rte = ? where handle = ?";
+                query = "UPDATE coder SET submissions = ?, rte = ?, rating = ? where handle = ?";
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setInt(1, cd.submissions + 1);
                 preparedStatement.setInt(2, cd.runtimeErrors + 1);
-                preparedStatement.setString(3, submission.handle);
+                preparedStatement.setInt(3, cd.rating + getRatingChange(submission));
+                preparedStatement.setString(4, submission.handle);
             }
             else if(submission.status.equals("Wrong Answer")) {
-                query = "UPDATE coder SET submissions = ?, wa = ? where handle = ?";
+                query = "UPDATE coder SET submissions = ?, wa = ?, rating = ? where handle = ?";
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setInt(1, cd.submissions + 1);
                 preparedStatement.setInt(2, cd.wrongAnswers + 1);
-                preparedStatement.setString(3, submission.handle);
+                preparedStatement.setInt(3, cd.rating + getRatingChange(submission));
+                preparedStatement.setString(4, submission.handle);
             }
             else {
-                query = "UPDATE coder SET submissions = ?, tle = ? where handle = ?";
+                query = "UPDATE coder SET submissions = ?, tle = ?, rating = ? where handle = ?";
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setInt(1, cd.submissions + 1);
                 preparedStatement.setInt(2, cd.timeLimitExceeds + 1);
-                preparedStatement.setString(3, submission.handle);
+                preparedStatement.setInt(3, cd.rating + getRatingChange(submission));
+                preparedStatement.setString(4, submission.handle);
             }
             int executeUpdate = preparedStatement.executeUpdate();
         } catch(Exception exception) {
@@ -593,5 +597,55 @@ public class Database {
         }
         Sorter.sortSubmissionsByDateTime(submissions, 2); //newer submission first
         return submissions;
+    }
+
+    private static int getRatingChange(Submission submission) {
+        int difficulty = getProblemDifficulty(submission.code);
+        int acSubmissions = getNumberOfACSubmissions(submission.handle, submission.code);
+        if(acSubmissions > 0) { //the problem has been already got accepted by user
+            return 0; //no rating change for this submission
+        }
+        
+        if(submission.status.equals("Accepted")) {
+            return 2*difficulty;
+        }
+        else {  //in case of TLE, RTE, WA
+            return -1*difficulty;
+        }        
+    }
+
+    private static int getProblemDifficulty(String code) {
+        String query = "SELECT difficulty from problems where code = ?";
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, code);
+            resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());            
+        }
+        return -1;
+    }
+
+    private static int getNumberOfACSubmissions(String handle, String code) {
+        String query = "SELECT count(*) from submissions where handle = ? and pcode = ? and status = 'Accepted'";
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, handle);
+            preparedStatement.setString(2, code);
+            resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch(Exception exception) {
+            JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());            
+        }
+        return 0;
     }
 }
