@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.crypto.SecretKey;
 import javax.swing.JOptionPane;
 
 /**
@@ -45,19 +46,22 @@ public class Database {
         return false;
     }
 
-    public static boolean checkAuthenitcity(String handle, String password) {
-        String query = "select handle from user where handle = ? and password = ?";
+    public static boolean checkAuthenitcity(String handle, String password, SecretKey desKey) {
+        String query = "select password from user where handle = ?";
         PreparedStatement preparedStatement;
         ResultSet resultSet;
-        
         try {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, handle);
-            preparedStatement.setString(2, password);
             resultSet = preparedStatement.executeQuery();
 
             if(resultSet.next()) {
-                return true;
+                String decryptedOriginalPassword = Security.getDecryptedPassword(resultSet.getString(1), desKey);
+                String decryptedAttemptedPassword = Security.getDecryptedPassword(password, desKey);
+                
+                if(decryptedOriginalPassword.equals(decryptedAttemptedPassword)) {
+                    return true;
+                }
             }
         } catch(Exception exception) {
             JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
@@ -87,16 +91,13 @@ public class Database {
     }
 
     public static boolean resetPassword(User user) {
-        String query = "UPDATE user SET password = ? where handle = ?";
+        String query = "UPDATE user SET password = '" + user.password + "' where handle = ?";
         PreparedStatement preparedStatement;
-        ResultSet resultSet;
         
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, user.password);
-            preparedStatement.setString(2, user.handle);
+            preparedStatement.setString(1, user.handle);
             int temp = preparedStatement.executeUpdate();
-            System.err.println(temp);
             return true;
         } catch(Exception exception) {
             JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
@@ -109,11 +110,10 @@ public class Database {
                 + "answer) values('"+user.name+"', '"+user.handle+"', '"+user.password+"', '"+
                 user.gender+"', '"+user.secQuestion+"', '"+user.answer+"')";
         PreparedStatement preparedStatement;
-        
+        System.out.println("Registered password : " + user.password);
         try {
             preparedStatement = connection.prepareStatement(query);
             int temp = preparedStatement.executeUpdate();
-            System.err.println(temp);
         } catch(Exception exception) {
             JOptionPane.showMessageDialog(null, "Server : " + exception.getMessage());
             return false;

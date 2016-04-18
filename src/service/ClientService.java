@@ -34,11 +34,11 @@ public class ClientService {
         else if(message.code == 2) {  //check authenticity (login credentials)
             reply.user = new User(message.user.handle, message.user.password);
             reply.code = message.code;
-            reply.status = Database.checkAuthenitcity(message.user.handle, message.user.password);
+            reply.status = Database.checkAuthenitcity(message.user.handle, message.user.password, message.desKey);
             return reply;
         }
         else if(message.code == 3) {  //check question-anwswer correctness
-            reply.user = new User(message.user.handle, "", "", message.user.secQuestion,
+            reply.user = new User(message.user.handle, "", null, message.user.secQuestion,
                     message.user.answer, "");
             reply.code = message.code;
             reply.status = Database.checkUserValidity(message.user);

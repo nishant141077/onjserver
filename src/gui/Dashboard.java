@@ -11,6 +11,11 @@
 package gui;
 
 import config.Configuration;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.spec.SecretKeySpec;
+import management.Security;
 import management.UserManagement;
 import socket.Connector;
 
@@ -84,6 +89,8 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 private void startServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startServerButtonActionPerformed
+    Configuration.desKey = new SecretKeySpec(Configuration.encryptionKey, 0, 
+            Configuration.encryptionKey.length, "DES");
     Connector connector = new Connector();
     connector.startServer();
 }//GEN-LAST:event_startServerButtonActionPerformed
